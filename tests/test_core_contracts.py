@@ -23,6 +23,7 @@ from consent_runtime_core import (  # noqa: E402
     normalized_location_pattern,
     normalize_path_template,
     privacy_findings,
+    sanitize_url,
     technical_priority,
 )
 from consent_runtime_core import read_json, write_json  # noqa: E402
@@ -184,6 +185,20 @@ class CmpTests(unittest.TestCase):
         self.assertTrue(state_matches_action({"ready": True, "state": "WITHDRAWN"}, "withdraw"))
         self.assertTrue(state_matches_action({"ready": True, "state": "REJECTED"}, "reject"))
         self.assertFalse(state_matches_action({"ready": True, "state": "ACCEPTED"}, "reject"))
+
+    def test_onetrust_differential_state_uses_baseline_and_banner_visibility(self) -> None:
+        baseline = {"ready": True, "active_groups": ["1"], "banner_visible": True}
+        rejected = {"ready": True, "active_groups": ["1"], "banner_visible": False}
+        accepted = {"ready": True, "active_groups": ["1", "2", "3", "4"], "banner_visible": False}
+        self.assertTrue(state_matches_action(rejected, "reject", baseline_state=baseline))
+        self.assertTrue(state_matches_action(rejected, "withdraw", baseline_state=baseline))
+        self.assertTrue(state_matches_action(accepted, "accept", baseline_state=baseline))
+        self.assertFalse(state_matches_action(baseline, "reject", baseline_state=baseline))
+
+    def test_numeric_asset_version_is_redacted_as_non_personal_query_value(self) -> None:
+        safe, names = sanitize_url("https://example.test/app.js?v=20250430123045")
+        self.assertEqual("https://example.test/app.js?v=%3Credacted%3E", safe)
+        self.assertEqual(["v"], names)
 
     def test_cdp_initiator_prefers_gtm_in_the_actual_stack(self) -> None:
         value = extract_cdp_initiator(

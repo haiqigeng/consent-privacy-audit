@@ -349,7 +349,7 @@ def read_cmp_state(page: Any, adapter: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def state_matches_action(state: dict[str, Any], action: str) -> bool:
+def state_matches_action(state: dict[str, Any], action: str, *, baseline_state: dict[str, Any] | None = None) -> bool:
     if not state.get("ready"):
         return False
     marker = str(state.get("state") or "").upper()
@@ -362,6 +362,14 @@ def state_matches_action(state: dict[str, Any], action: str) -> bool:
             "untouched": {"UNTOUCHED"},
         }
         return marker in expected.get(action, {marker})
+    current_groups = {str(value) for value in state.get("active_groups", [])} if isinstance(state.get("active_groups"), list) else None
+    baseline_groups = {str(value) for value in (baseline_state or {}).get("active_groups", [])} if isinstance((baseline_state or {}).get("active_groups"), list) else None
+    if current_groups is not None and baseline_groups is not None:
+        banner_closed = state.get("banner_visible") is False
+        if action in {"reject", "withdraw"}:
+            return current_groups == baseline_groups and banner_closed
+        if action == "accept":
+            return banner_closed or current_groups != baseline_groups
     boolean_sets: list[list[bool]] = []
     choices = state.get("choices")
     if isinstance(choices, dict):
@@ -778,6 +786,7 @@ def execute_scenario(
             "matched_kinds": detection.matched_kinds,
         }
         observations.extend(network_observations(run, scenario, recorder.slice(cursor), "initial_load"))
+        initial_state = read_cmp_state(page, adapter)
         observations.append(
             make_observation(
                 run=run,
@@ -785,7 +794,7 @@ def execute_scenario(
                 action_window="initial_load",
                 page_url=page.url,
                 surface="CMP_STATE",
-                data={"phase": "initial", "state": read_cmp_state(page, adapter), "settled": settled, "settle_elapsed_ms": elapsed, "detection": detection_summary},
+                data={"phase": "initial", "state": initial_state, "settled": settled, "settle_elapsed_ms": elapsed, "detection": detection_summary},
                 layer="CMP",
             )
         )
@@ -833,7 +842,7 @@ def execute_scenario(
                 break
             settled, elapsed = recorder.wait_quiet(page, quiet_ms=quiet_ms, timeout_ms=timeout_ms)
             state = read_cmp_state(page, adapter)
-            action_state_verified = state_matches_action(state, action)
+            action_state_verified = state_matches_action(state, action, baseline_state=initial_state)
             transition_states_verified = transition_states_verified and action_state_verified
             state_verified = transition_states_verified
             window = f"choice_{index + 1}_{action}"
@@ -862,7 +871,6 @@ def execute_scenario(
                 )
             )
         if scenario_class == "UNTOUCHED":
-            initial_state = read_cmp_state(page, adapter)
             state_verified = state_matches_action(initial_state, "untouched")
         if transition_actions and scenario["status"] != "INCONCLUSIVE":
             final_action = transition_actions[-1]
@@ -871,7 +879,7 @@ def execute_scenario(
             later_window = f"post_{final_action}_later"
             observations.extend(network_observations(run, scenario, recorder.slice(later_cursor), later_window))
             later_state = read_cmp_state(page, adapter)
-            later_verified = state_matches_action(later_state, final_action)
+            later_verified = state_matches_action(later_state, final_action, baseline_state=initial_state)
             state_verified = state_verified and later_verified
             observations.append(
                 make_observation(
@@ -938,7 +946,7 @@ def execute_scenario(
                 settled, elapsed = recorder.wait_quiet(page, quiet_ms=quiet_ms, timeout_ms=timeout_ms)
                 persisted_state = read_cmp_state(page, adapter)
                 persisted_action = "accept" if scenario_class == "PERSISTENCE_ACCEPTED" else "reject"
-                state_verified = state_matches_action(persisted_state, persisted_action)
+                state_verified = state_matches_action(persisted_state, persisted_action, baseline_state=initial_state)
                 observations.extend(network_observations(run, scenario, recorder.slice(cursor), "persistence_revisit"))
                 observations.append(
                     make_observation(

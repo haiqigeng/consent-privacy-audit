@@ -21,8 +21,8 @@
   "readiness_signals": ["OneTrustGroupsUpdated observed", "OnetrustActiveGroups populated", "OneTrust global exists"],
   "state_reader": {
     "kind": "JAVASCRIPT_EXPRESSION",
-    "expression": "() => { const raw = window.OnetrustActiveGroups; const values = Array.isArray(raw) ? raw : String(raw || '').split(','); return {ready: typeof raw !== 'undefined', active_groups: values.map(v => String(v).trim()).filter(Boolean).sort()}; }",
-    "retained_fields": ["ready", "active category ids"],
+    "expression": "() => { const raw = window.OnetrustActiveGroups; const values = Array.isArray(raw) ? raw : String(raw || '').split(','); const banner = document.querySelector('#onetrust-banner-sdk,[role=dialog][aria-modal=true]'); const banner_visible = !!banner && !!(banner.offsetWidth || banner.offsetHeight || banner.getClientRects().length); return {ready: typeof raw !== 'undefined', active_groups: values.map(v => String(v).trim()).filter(Boolean).sort(), banner_visible}; }",
+    "retained_fields": ["ready", "active category ids", "banner visibility"],
     "prohibited_fields": ["OptanonConsent raw value", "consentId", "geolocation value", "data subject identifiers"]
   },
   "semantic_controls": {

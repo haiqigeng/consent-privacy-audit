@@ -238,7 +238,7 @@ def normalize_path_template(path: str) -> str:
 def _safe_query_value(name: str, value: str) -> str:
     if name.lower() not in SAFE_QUERY_VALUE_FIELDS:
         return "<redacted>"
-    if EMAIL_RE.search(value) or BEARER_RE.search(value) or JWT_RE.search(value) or UUID_RE.search(value):
+    if EMAIL_RE.search(value) or BEARER_RE.search(value) or JWT_RE.search(value) or UUID_RE.search(value) or PHONE_RE.search(value):
         return "<redacted>"
     if len(value) > 128 or not re.fullmatch(r"[A-Za-z0-9._,:+/-]*", value):
         return "<redacted>"
