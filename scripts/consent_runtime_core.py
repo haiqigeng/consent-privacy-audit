@@ -571,6 +571,9 @@ def privacy_findings(text: str, *, canaries: Iterable[str] = ()) -> list[str]:
     phone_found = False
     for match in PHONE_RE.finditer(text):
         candidate = match.group(0).strip()
+        digits_only = candidate.isdigit()
+        if digits_only and 12 <= len(candidate) <= 15 and candidate[0] in "12":
+            continue
         if "." in candidate and not re.search(r"[ +()/-]", candidate):
             parts = candidate.split(".")
             if not (len(parts) == 5 and all(len(part) == 2 for part in parts)):

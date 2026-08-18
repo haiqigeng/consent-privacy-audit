@@ -265,6 +265,7 @@ class SafetyTests(unittest.TestCase):
         self.assertIn("EMAIL", privacy_findings("contact jane@example.com"))
         self.assertIn("PHONE", privacy_findings("call 01 23 45 67 89"))
         self.assertNotIn("PHONE", privacy_findings("Chromium 151.0.7922.34"))
+        self.assertNotIn("PHONE", privacy_findings('{"expires": 1767225600000}'))
         with self.assertRaises(PrivacyError):
             review_text("visible synthetic-test-canary", ["synthetic-test-canary"])
         review_text("Cookie settings", ["synthetic-test-canary"])
