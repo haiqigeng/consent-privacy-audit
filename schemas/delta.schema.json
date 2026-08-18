@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/delta.schema.json",
+  "title": "Consent runtime rescan delta",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "previous_run_id", "current_run_id", "generated_at", "comparison_scope", "reason_codes", "versions", "compared_slices", "items", "priority_changes"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "previous_run_id": {"type": "string"},
+    "current_run_id": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "comparison_scope": {"enum": ["FULLY_COMPARABLE", "PARTIALLY_COMPARABLE", "NOT_COMPARABLE"]},
+    "reason_codes": {
+      "type": "array",
+      "items": {"enum": ["DIFFERENT_ORIGIN_OR_ENVIRONMENT", "FINGERPRINT_ALGORITHM_CHANGED", "RULE_MEANING_OR_APPLICABILITY_CHANGED", "REQUIRED_PROFILE_OR_SOURCE_NOT_VERIFIED", "SCENARIO_DEFINITION_CHANGED", "MARKET_OR_NETWORK_ROUTE_CHANGED", "REQUIRED_CAPTURE_CAPABILITY_MISSING", "REQUIRED_SCENARIO_NOT_EXECUTED", "LOCATION_NOT_SAMPLED_IN_BOTH_RUNS", "IDENTITY_NORMALIZATION_CHANGED", "CONSENT_ADAPTER_SEMANTICS_CHANGED"]},
+      "uniqueItems": true
+    },
+    "versions": {"type": "object"},
+    "compared_slices": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding_fingerprint", "classification", "previous_present", "current_present", "slice_id", "reason_codes"],
+        "properties": {
+          "finding_fingerprint": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "classification": {"enum": ["FIXED", "PERSISTENT", "REGRESSED", "NEW", "NOT_COMPARABLE"]},
+          "previous_present": {"type": "boolean"},
+          "current_present": {"type": "boolean"},
+          "slice_id": {"type": "string"},
+          "reason_codes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        }
+      }
+    },
+    "priority_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding_fingerprint", "previous_priority", "current_priority", "comparable"],
+        "properties": {
+          "finding_fingerprint": {"type": "string"},
+          "previous_priority": {"type": ["string", "null"]},
+          "current_priority": {"type": ["string", "null"]},
+          "comparable": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

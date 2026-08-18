@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/cmp-adapter.schema.json",
+  "title": "Consent management platform adapter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "adapter_id", "adapter_version", "provider", "supported_version_range", "official_sources", "last_verified_at", "detection_signatures", "readiness_signals", "state_reader", "semantic_controls", "locales", "api_fallback", "known_limitations"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "adapter_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "adapter_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "provider": {"type": "string"},
+    "supported_version_range": {"type": "string"},
+    "official_sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "title", "verified_at"],
+        "properties": {
+          "url": {"type": "string", "format": "uri"},
+          "title": {"type": "string"},
+          "verified_at": {"type": "string", "format": "date"}
+        }
+      }
+    },
+    "last_verified_at": {"type": "string", "format": "date"},
+    "detection_signatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "pattern", "weight"],
+        "properties": {
+          "kind": {"enum": ["GLOBAL", "SCRIPT_HOST", "SCRIPT_PATH", "COOKIE_NAME", "STORAGE_KEY", "DOM", "EVENT", "TCF_API"]},
+          "pattern": {"type": "string", "minLength": 1},
+          "weight": {"type": "integer", "minimum": 1, "maximum": 100}
+        }
+      }
+    },
+    "readiness_signals": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "state_reader": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "expression", "retained_fields", "prohibited_fields"],
+      "properties": {
+        "kind": {"enum": ["JAVASCRIPT_EXPRESSION", "TCF_API", "BROWSER_DIFFERENTIAL"]},
+        "expression": {"type": ["string", "null"]},
+        "retained_fields": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "prohibited_fields": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "semantic_controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accept", "reject", "preferences", "save", "reopen", "withdraw"],
+      "properties": {
+        "accept": {"$ref": "#/$defs/control"},
+        "reject": {"$ref": "#/$defs/control"},
+        "preferences": {"$ref": "#/$defs/control"},
+        "save": {"$ref": "#/$defs/control"},
+        "reopen": {"$ref": "#/$defs/control"},
+        "withdraw": {"$ref": "#/$defs/control"}
+      }
+    },
+    "locales": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "api_fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "documented_method", "ux_status_when_used"],
+      "properties": {
+        "allowed": {"type": "boolean"},
+        "documented_method": {"type": ["string", "null"]},
+        "ux_status_when_used": {"enum": ["INCONCLUSIVE", "NOT_TESTED"]}
+      }
+    },
+    "known_limitations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  },
+  "$defs": {
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roles", "label_patterns", "provider_selectors"],
+      "properties": {
+        "roles": {"type": "array", "items": {"enum": ["button", "link", "checkbox", "switch"]}, "uniqueItems": true},
+        "label_patterns": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "provider_selectors": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    }
+  }
+}

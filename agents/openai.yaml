@@ -1,0 +1,6 @@
+interface:
+  display_name: "Consent Privacy Audit"
+  short_description: "Audit deployed consent and tracker behavior"
+  default_prompt: "Use $consent-privacy-audit to audit this deployed site's consent and tracker behavior without making legal conclusions or changing the implementation."
+policy:
+  allow_implicit_invocation: true

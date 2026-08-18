@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "profile_id": "neutral-technical",
+  "profile_version": "1.0.0",
+  "title": "Jurisdiction-neutral browser observation baseline",
+  "jurisdiction": null,
+  "status": "ACTIVE",
+  "sources": [
+    {
+      "source_id": "NEUTRAL-BASELINE-V1",
+      "source_type": "INTERNAL_TECHNICAL_BASELINE",
+      "authority": "consent-privacy-audit",
+      "title": "Neutral technical baseline v1",
+      "url": null,
+      "section_locator": {"kind": "LOCAL_BASELINE", "start_marker": "neutral-technical-baseline-v1", "end_marker": null},
+      "verification_method": "LOCAL_IMMUTABLE",
+      "content_fingerprint": "55f521f057b4dc86ecf81c03d80121e73297593bbb9d0dbe625aff92459f6a2b",
+      "content_fingerprint_algo_version": "normalized-text-sha256-v1",
+      "normalization_version": "visible-text-nfc-whitespace-v1",
+      "volatile": false,
+      "staleness_threshold_days": 3650,
+      "retrieved_at": "2026-08-18T12:00:00+02:00",
+      "last_human_verified_at": "2026-08-18T12:00:00+02:00",
+      "effective_date": "2026-08-18",
+      "transition_deadline": null
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "TECH.STATE.VERIFIED",
+      "source_ids": ["NEUTRAL-BASELINE-V1"],
+      "title": "Resulting consent state is verified before comparison",
+      "applicability_facts": ["A visitor-facing consent mechanism is present or expected"],
+      "observable_test": "Verify each choice or transition through a documented CMP state surface plus browser differential evidence.",
+      "expected_by_scenario": {"UNTOUCHED": "No implicit choice is recorded", "REJECTED": "A rejected state is verified", "ACCEPTED": "An accepted state is verified", "ACCEPTED_TO_WITHDRAWN": "The withdrawn state is verified", "PERSISTENCE_ACCEPTED": "The accepted choice remains observable", "PERSISTENCE_REJECTED": "The rejected choice remains observable"},
+      "exceptions": ["Unknown/custom CMP may require analyst-assisted state confirmation"],
+      "unobservable_dependencies": ["CMP back-office receipt and retention"],
+      "legal_review_required": false,
+      "superseded": false
+    },
+    {
+      "rule_id": "TECH.CHOICE.DIFFERENTIAL",
+      "source_ids": ["NEUTRAL-BASELINE-V1"],
+      "title": "Browser behaviour is compared across visitor choices",
+      "applicability_facts": ["Comparable scenarios use the same material sample"],
+      "observable_test": "Compare normalized requests, storage, scripts, embeds, consent signals, and initiators across untouched, rejected, accepted, and granular states.",
+      "expected_by_scenario": {"UNTOUCHED": "Observed without legal classification", "REJECTED": "Differential is recorded", "ACCEPTED": "Differential is recorded", "GRANULAR_DENIED": "Category-specific differential is recorded"},
+      "exceptions": ["A request under denied storage is not automatically a contradiction"],
+      "unobservable_dependencies": ["Downstream server processing"],
+      "legal_review_required": false,
+      "superseded": false
+    },
+    {
+      "rule_id": "TECH.WITHDRAWAL.DIFFERENTIAL",
+      "source_ids": ["NEUTRAL-BASELINE-V1"],
+      "title": "Withdrawal transition and later browser behaviour are observed",
+      "applicability_facts": ["An accepted state and visitor-facing preference mechanism are available"],
+      "observable_test": "Accept, reopen preferences, withdraw in the same context, then record immediate and later requests and storage access.",
+      "expected_by_scenario": {"ACCEPTED_TO_WITHDRAWN": "State transition and continued or stopped activity are both recorded without assuming already-loaded vendors stop"},
+      "exceptions": ["No legal failure is inferred under the neutral profile"],
+      "unobservable_dependencies": ["Vendor-side deletion or downstream stop"],
+      "legal_review_required": false,
+      "superseded": false
+    },
+    {
+      "rule_id": "TECH.CANARY.EXTERNAL.DISCLOSURE",
+      "source_ids": ["NEUTRAL-BASELINE-V1"],
+      "title": "Synthetic data reaches only an approved technical destination",
+      "applicability_facts": ["A safe registered interaction and synthetic canary are available", "The destination's intended or unintended status is technically established"],
+      "observable_test": "Detect a synthetic canary in memory at the browser request boundary and compare its minimized destination and parameter path with the approved interaction model.",
+      "expected_by_scenario": {"UNTOUCHED": "No canary action", "REJECTED": "No unintended external disclosure", "ACCEPTED": "No unintended external disclosure"},
+      "exceptions": ["A same-origin or unknown-purpose destination remains inconclusive until its technical role is established", "Submit-dependent leakage is NOT_TESTED without exact submission authorization"],
+      "unobservable_dependencies": ["Downstream enrichment after browser receipt"],
+      "legal_review_required": false,
+      "superseded": false
+    },
+    {
+      "rule_id": "TECH.CANARY.NONRETENTION",
+      "source_ids": ["NEUTRAL-BASELINE-V1"],
+      "title": "Synthetic canary detection retains no canary value",
+      "applicability_facts": ["A safe registered interaction and synthetic canary are available"],
+      "observable_test": "Detect the in-memory canary in outbound browser requests and retain only category, destination, safe parameter path, and NOT_RETAINED marker.",
+      "expected_by_scenario": {"UNTOUCHED": "No canary action", "REJECTED": "Detection is recorded without value retention", "ACCEPTED": "Detection is recorded without value retention"},
+      "exceptions": ["Submit-dependent leakage is NOT_TESTED without exact submission authorization"],
+      "unobservable_dependencies": ["Downstream enrichment after browser receipt"],
+      "legal_review_required": false,
+      "superseded": false
+    },
+    {
+      "rule_id": "TECH.DECLARATION.CONSISTENCY",
+      "source_ids": ["NEUTRAL-BASELINE-V1"],
+      "title": "Observed products are compared with tracker declarations",
+      "applicability_facts": ["A public tracker-relevant declaration is available"],
+      "observable_test": "Normalize observed vendor/product identities and compare them with public cookie or preference-center declarations.",
+      "expected_by_scenario": {"UNTOUCHED": "All observed products remain in the comparison", "ACCEPTED": "Interaction-triggered products remain in the comparison"},
+      "exceptions": ["Declared-but-unobserved is NOT_VERIFIED rather than failed"],
+      "unobservable_dependencies": ["Complete internal vendor inventory"],
+      "legal_review_required": true,
+      "superseded": false
+    }
+  ]
+}

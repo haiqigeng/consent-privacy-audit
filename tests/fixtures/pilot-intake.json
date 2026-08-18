@@ -1,0 +1,21 @@
+{
+  "run_id": "CONTROLLED-PILOT-001",
+  "urls": ["http://127.0.0.1:8765/", "http://127.0.0.1:8765/second"],
+  "environment": "test",
+  "deployment_verified": true,
+  "deployment_evidence": ["Local controlled fixture server from tests/fixture_server.py"],
+  "rule_profiles": [
+    {"profile_id": "neutral-technical", "applicability": "CONFIRMED"},
+    {"profile_id": "cnil-fr", "applicability": "CONFIRMED"}
+  ],
+  "markets": [],
+  "declaration_urls": ["http://127.0.0.1:8765/cookies"],
+  "exclusions": [],
+  "authenticated_boundaries": ["No authenticated fixture routes; authenticated consent sync remains post-v1"],
+  "network_route_id": "CONTROLLED-LOCALHOST",
+  "externally_verified_region": null,
+  "browser_geolocation_emulated": false,
+  "locale": "en-US",
+  "timezone": "Europe/Paris",
+  "headed": false
+}

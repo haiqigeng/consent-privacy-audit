@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "adapter_id": "axeptio-web",
+  "adapter_version": "1.0.0",
+  "provider": "Axeptio",
+  "supported_version_range": "Public web SDK signatures verified 2026-08-18; exact deployed version must be recorded when exposed",
+  "official_sources": [
+    {"url": "https://support.axeptio.eu/en/articles/274036-axeptio-javascript-sdk", "title": "About Axeptio's Javascript SDK", "verified_at": "2026-08-18"},
+    {"url": "https://support.axeptio.eu/en/articles/274040-options-and-advanced-mode-axeptiosettings", "title": "Options and advanced mode: axeptioSettings", "verified_at": "2026-08-18"},
+    {"url": "https://support.axeptio.eu/en/articles/348263-how-axeptio-communicates-with-gtm-events-and-variables", "title": "How Axeptio communicates with GTM", "verified_at": "2026-08-18"}
+  ],
+  "last_verified_at": "2026-08-18",
+  "detection_signatures": [
+    {"kind": "GLOBAL", "pattern": "axeptioSDK", "weight": 55},
+    {"kind": "GLOBAL", "pattern": "_axcb", "weight": 20},
+    {"kind": "COOKIE_NAME", "pattern": "^axeptio_(cookies|authorized_vendors|all_vendors)$", "weight": 35},
+    {"kind": "COOKIE_NAME", "pattern": "^_ax_token$", "weight": 15},
+    {"kind": "EVENT", "pattern": "^axeptio_(update|activate_|enable_|disable_)", "weight": 20}
+  ],
+  "readiness_signals": ["window.axeptioSDK exists", "window._axcb callback executes"],
+  "state_reader": {
+    "kind": "JAVASCRIPT_EXPRESSION",
+    "expression": "() => { const sdk = window.axeptioSDK; const raw = sdk && sdk.userPreferencesManager && sdk.userPreferencesManager.choices || {}; const choices = {}; for (const [k,v] of Object.entries(raw)) { if (typeof v === 'boolean') choices[k] = v; else if (v && typeof v === 'object' && typeof v.value === 'boolean') choices[k] = v.value; } return {ready: !!sdk, choices}; }",
+    "retained_fields": ["ready", "choices.<service_boolean>"],
+    "prohibited_fields": ["token", "getToken", "visitor identifier", "raw consent cookie"]
+  },
+  "semantic_controls": {
+    "accept": {"roles": ["button"], "label_patterns": ["^(accept all|allow all|tout accepter|j.accepte|accepter tout)$"], "provider_selectors": []},
+    "reject": {"roles": ["button", "link"], "label_patterns": ["^(reject all|decline|tout refuser|continuer sans accepter|je refuse|refuser tout)$"], "provider_selectors": []},
+    "preferences": {"roles": ["button", "link"], "label_patterns": ["^(manage|manage preferences|customize|personnaliser|parametrer|gerer mes choix|je choisis)$"], "provider_selectors": []},
+    "save": {"roles": ["button"], "label_patterns": ["^(save|save choices|confirm|enregistrer|confirmer mes choix|valider)$"], "provider_selectors": []},
+    "reopen": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|privacy settings|manage cookies|gerer mes cookies|mes preferences|cookies)$"], "provider_selectors": []},
+    "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(reject all|withdraw|tout refuser|retirer mon consentement|je refuse)$"], "provider_selectors": []}
+  },
+  "locales": ["en", "fr"],
+  "api_fallback": {"allowed": false, "documented_method": null, "ux_status_when_used": "NOT_TESTED"},
+  "known_limitations": ["Axeptio widgets are highly configurable; semantic labels take precedence over selectors", "Publisher TCF variants also require the generic TCF adapter"]
+}

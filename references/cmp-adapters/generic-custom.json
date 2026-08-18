@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "adapter_id": "generic-custom-banner",
+  "adapter_version": "1.0.0",
+  "provider": "Unknown or custom consent interface",
+  "supported_version_range": "Provider-independent rendered UI fallback",
+  "official_sources": [
+    {"url": "https://cnil.fr/fr/cookies-et-autres-traceurs/regles/cookies/comment-mettre-mon-site-web-en-conformite", "title": "CNIL cookie interface guidance", "verified_at": "2026-08-18"}
+  ],
+  "last_verified_at": "2026-08-18",
+  "detection_signatures": [
+    {"kind": "DOM", "pattern": "[role=dialog], dialog, [aria-modal=true]", "weight": 10}
+  ],
+  "readiness_signals": ["Rendered consent-purpose text and unambiguous semantic controls are visible"],
+  "state_reader": {
+    "kind": "BROWSER_DIFFERENTIAL",
+    "expression": null,
+    "retained_fields": ["visible control semantics", "cookie/storage key changes", "network differential"],
+    "prohibited_fields": ["guessed provider token", "fabricated consent value", "undocumented cookie edits"]
+  },
+  "semantic_controls": {
+    "accept": {"roles": ["button"], "label_patterns": ["^(accept all|allow all|agree|tout accepter|j.accepte|accepter tout)$"], "provider_selectors": []},
+    "reject": {"roles": ["button", "link"], "label_patterns": ["^(reject all|decline|disagree|tout refuser|continuer sans accepter|je refuse)$"], "provider_selectors": []},
+    "preferences": {"roles": ["button", "link"], "label_patterns": ["^(manage preferences|customize|settings|personnaliser|parametrer|gerer mes choix)$"], "provider_selectors": []},
+    "save": {"roles": ["button"], "label_patterns": ["^(save choices|confirm|save|enregistrer|confirmer mes choix|valider)$"], "provider_selectors": []},
+    "reopen": {"roles": ["button", "link"], "label_patterns": ["^(privacy settings|cookie settings|manage cookies|gerer mes cookies|mes preferences|cookies)$"], "provider_selectors": []},
+    "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(reject all|withdraw|tout refuser|retirer mon consentement)$"], "provider_selectors": []}
+  },
+  "locales": ["en", "fr"],
+  "api_fallback": {"allowed": false, "documented_method": null, "ux_status_when_used": "NOT_TESTED"},
+  "known_limitations": ["Provider identity remains UNKNOWN or PROBABLE", "Ambiguous controls require one analyst-assisted interaction", "No provider-specific API fallback is allowed"]
+}

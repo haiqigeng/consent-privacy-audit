@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/rule-profile.schema.json",
+  "title": "Consent runtime rule profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile_id", "profile_version", "title", "jurisdiction", "status", "sources", "rules"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "profile_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "profile_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "title": {"type": "string"},
+    "jurisdiction": {"type": ["string", "null"]},
+    "status": {"enum": ["ACTIVE", "DRAFT", "SUPERSEDED"]},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "source_type", "authority", "title", "url", "section_locator", "verification_method", "content_fingerprint", "content_fingerprint_algo_version", "normalization_version", "volatile", "staleness_threshold_days", "retrieved_at", "last_human_verified_at", "effective_date", "transition_deadline"],
+        "properties": {
+          "source_id": {"type": "string"},
+          "source_type": {"enum": ["BINDING_RULE", "REGULATOR_INTERPRETATION", "REGULATOR_RECOMMENDATION", "TECHNICAL_STANDARD", "VENDOR_DOCUMENTATION", "CLIENT_POLICY", "INTERNAL_TECHNICAL_BASELINE"]},
+          "authority": {"type": "string"},
+          "title": {"type": "string"},
+          "url": {"type": ["string", "null"], "format": "uri"},
+          "section_locator": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "start_marker", "end_marker"],
+            "properties": {
+              "kind": {"enum": ["FULL_DOCUMENT", "TEXT_BETWEEN", "EXACT_TEXT_FRAGMENT", "VERSIONED_RESOURCE", "LOCAL_BASELINE"]},
+              "start_marker": {"type": ["string", "null"]},
+              "end_marker": {"type": ["string", "null"]}
+            }
+          },
+          "verification_method": {"enum": ["CONTENT_FINGERPRINT", "VERSIONED_RESOURCE", "LOCAL_IMMUTABLE"]},
+          "content_fingerprint": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "content_fingerprint_algo_version": {"const": "normalized-text-sha256-v1"},
+          "normalization_version": {"const": "visible-text-nfc-whitespace-v1"},
+          "volatile": {"type": "boolean"},
+          "staleness_threshold_days": {"type": "integer", "minimum": 1, "maximum": 3650},
+          "retrieved_at": {"type": "string", "format": "date-time"},
+          "last_human_verified_at": {"type": "string", "format": "date-time"},
+          "effective_date": {"type": ["string", "null"], "format": "date"},
+          "transition_deadline": {"type": ["string", "null"], "format": "date"}
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "source_ids", "title", "applicability_facts", "observable_test", "expected_by_scenario", "exceptions", "unobservable_dependencies", "legal_review_required", "superseded"],
+        "properties": {
+          "rule_id": {"type": "string", "pattern": "^[A-Z0-9._-]+$"},
+          "source_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+          "title": {"type": "string"},
+          "applicability_facts": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "observable_test": {"type": "string"},
+          "expected_by_scenario": {"type": "object", "additionalProperties": {"type": "string"}},
+          "exceptions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "unobservable_dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "legal_review_required": {"type": "boolean"},
+          "superseded": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

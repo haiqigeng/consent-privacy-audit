@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "adapter_id": "generic-tcf-web",
+  "adapter_version": "1.0.0",
+  "provider": "Generic IAB TCF CMP",
+  "supported_version_range": "Current deployed TCF API version must be resolved from official specifications and CMP response",
+  "official_sources": [
+    {"url": "https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md", "title": "IAB Europe CMP API specification", "verified_at": "2026-08-18"},
+    {"url": "https://iabeurope.eu/cmp-vendor-notifications/", "title": "IAB Europe CMP and vendor notifications", "verified_at": "2026-08-18"}
+  ],
+  "last_verified_at": "2026-08-18",
+  "detection_signatures": [
+    {"kind": "TCF_API", "pattern": "__tcfapi", "weight": 70},
+    {"kind": "DOM", "pattern": "iframe[name=__tcfapiLocator]", "weight": 45},
+    {"kind": "COOKIE_NAME", "pattern": "^(euconsent-v2|euconsent)$", "weight": 20}
+  ],
+  "readiness_signals": ["__tcfapi ping returns cmpLoaded", "addEventListener returns cmpStatus loaded and eventStatus tcloaded or useractioncomplete"],
+  "state_reader": {
+    "kind": "TCF_API",
+    "expression": null,
+    "retained_fields": ["cmpStatus", "eventStatus", "gdprApplies", "tcfPolicyVersion", "cmpId", "enabled purpose ids", "enabled vendor ids", "tc_string_present"],
+    "prohibited_fields": ["tcString", "publisherTC", "raw consent cookie", "stable user identifier"]
+  },
+  "semantic_controls": {
+    "accept": {"roles": ["button"], "label_patterns": ["^(accept all|allow all|agree|tout accepter|j.accepte)$"], "provider_selectors": []},
+    "reject": {"roles": ["button", "link"], "label_patterns": ["^(reject all|decline|disagree|tout refuser|continuer sans accepter)$"], "provider_selectors": []},
+    "preferences": {"roles": ["button", "link"], "label_patterns": ["^(manage preferences|partners|vendors|customize|personnaliser|gerer mes choix|nos partenaires)$"], "provider_selectors": []},
+    "save": {"roles": ["button"], "label_patterns": ["^(save choices|confirm|enregistrer|confirmer mes choix|valider)$"], "provider_selectors": []},
+    "reopen": {"roles": ["button", "link"], "label_patterns": ["^(privacy settings|cookie settings|manage cookies|gerer mes cookies|mes preferences)$"], "provider_selectors": []},
+    "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(reject all|withdraw|tout refuser|retirer mon consentement)$"], "provider_selectors": []}
+  },
+  "locales": ["en", "fr"],
+  "api_fallback": {"allowed": false, "documented_method": null, "ux_status_when_used": "NOT_TESTED"},
+  "known_limitations": ["TCF presence does not identify the CMP provider", "Never fabricate or edit a TC string", "Decode only against the current verified specification and Global Vendor List"]
+}

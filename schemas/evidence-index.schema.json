@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/evidence-index.schema.json",
+  "title": "Sanitized evidence index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "generated_at", "artifacts"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidence_id", "kind", "path", "sha256", "restricted", "sanitization_status", "contains_canary_value", "contains_personal_data", "screenshot_review"],
+        "properties": {
+          "evidence_id": {"type": "string", "pattern": "^EVD-[A-Za-z0-9._-]+$"},
+          "kind": {"enum": ["REQUEST_EXCERPT", "STATE_TIMING", "SCREENSHOT", "DOM_EXCERPT", "SOURCE_CHECK", "OTHER"]},
+          "path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "restricted": {"const": false},
+          "sanitization_status": {"const": "PASSED"},
+          "contains_canary_value": {"const": false},
+          "contains_personal_data": {"const": false},
+          "screenshot_review": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["cropped_or_masked", "ocr_status", "analyst_status"],
+            "properties": {
+              "cropped_or_masked": {"const": true},
+              "ocr_status": {"const": "PASSED"},
+              "analyst_status": {"const": "PASSED"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

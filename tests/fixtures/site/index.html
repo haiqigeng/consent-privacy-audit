@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-consent-state="UNTOUCHED">
+<head>
+  <meta charset="utf-8">
+  <title>Controlled consent fixture</title>
+</head>
+<body>
+  <main>
+    <h1>Controlled consent fixture</h1>
+    <form id="lead-form">
+      <label for="test-email">Test email</label>
+      <input id="test-email" name="email" type="email">
+      <button id="validate" type="button">Validate</button>
+      <button id="submit" type="submit">Submit</button>
+    </form>
+  </main>
+  <button id="reopen" type="button">Cookie settings</button>
+  <div id="consent-dialog" role="dialog" aria-modal="true" aria-label="Cookie consent">
+    <p>Choose whether analytics cookies may run.</p>
+    <button id="accept" type="button">Accept all</button>
+    <button id="reject" type="button">Reject all</button>
+  </div>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const dialog = document.getElementById('consent-dialog');
+      let timer = null;
+      const stored = localStorage.getItem('fixture-consent');
+      const setState = state => {
+        root.setAttribute('data-consent-state', state);
+        localStorage.setItem('fixture-consent', state);
+        document.cookie = `fixture_consent=${state}; Path=/; SameSite=Lax`;
+        dialog.hidden = true;
+      };
+      const ping = phase => fetch(`/collect?phase=${encodeURIComponent(phase)}&cid=fixture-stable-id`, {keepalive:true});
+      const accept = () => {
+        setState('ACCEPTED');
+        ping('accepted');
+        timer = setInterval(() => ping(root.getAttribute('data-consent-state')), 650);
+      };
+      const reject = () => {
+        const prior = root.getAttribute('data-consent-state');
+        setState(prior === 'ACCEPTED' ? 'WITHDRAWN' : 'REJECTED');
+        // Deliberately do not clear timer: this models an already-loaded vendor.
+      };
+      if (stored) {
+        root.setAttribute('data-consent-state', stored);
+        dialog.hidden = true;
+        if (stored === 'ACCEPTED') ping('persistence');
+      }
+      document.getElementById('accept').addEventListener('click', accept);
+      document.getElementById('reject').addEventListener('click', reject);
+      document.getElementById('reopen').addEventListener('click', () => { dialog.hidden = false; });
+      document.getElementById('validate').addEventListener('click', () => {
+        const value = document.getElementById('test-email').value;
+        fetch(`/collect?validation=${encodeURIComponent(value)}`, {keepalive:true});
+      });
+      document.getElementById('lead-form').addEventListener('submit', event => {
+        event.preventDefault();
+        fetch('/submit', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:document.getElementById('test-email').value})});
+      });
+    })();
+  </script>
+</body>
+</html>

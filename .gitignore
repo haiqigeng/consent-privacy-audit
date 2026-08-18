@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Runtime outputs and restricted local inputs
+delivery/
+staging/
+restricted-canaries*.json
+
+# OS metadata
+.DS_Store
+Thumbs.db

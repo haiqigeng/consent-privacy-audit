@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/declaration-diff.schema.json",
+  "title": "Observed tracker declaration comparison",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "generated_at", "items"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item_id", "vendor_product_key", "display_name", "observed", "declared", "direction", "status", "confidence", "observed_evidence_ids", "declaration_source", "declaration_ids", "declaration_wording", "purpose_comparison", "duration_comparison", "legal_review_required"],
+        "properties": {
+          "item_id": {"type": "string", "pattern": "^DECL-[A-Za-z0-9._-]+$"},
+          "vendor_product_key": {"type": "string"},
+          "display_name": {"type": "string"},
+          "observed": {"type": "boolean"},
+          "declared": {"type": "boolean"},
+          "direction": {"enum": ["OBSERVED_UNDECLARED", "DECLARED_UNOBSERVED", "BOTH", "AMBIGUOUS"]},
+          "status": {"enum": ["MATCHED", "TECHNICAL_DECLARATION_MISMATCH", "NOT_VERIFIED", "INCONCLUSIVE"]},
+          "confidence": {"enum": ["CONFIRMED", "PROBABLE", "UNKNOWN", "CONFLICTING"]},
+          "observed_evidence_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "declaration_source": {"type": ["string", "null"], "format": "uri"},
+          "declaration_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "declaration_wording": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["display_name", "purpose_text", "category_text", "duration_text"],
+              "properties": {
+                "display_name": {"type": "string"},
+                "purpose_text": {"type": ["string", "null"]},
+                "category_text": {"type": ["string", "null"]},
+                "duration_text": {"type": ["string", "null"]}
+              }
+            }
+          },
+          "purpose_comparison": {"type": ["string", "null"], "maxLength": 2000},
+          "duration_comparison": {"type": ["string", "null"], "maxLength": 2000},
+          "legal_review_required": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

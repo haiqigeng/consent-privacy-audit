@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "adapter_id": "onetrust-web",
+  "adapter_version": "1.0.0",
+  "provider": "OneTrust",
+  "supported_version_range": "OneTrust Web CMP event and data-layer surfaces verified 2026-08-18; tenant UI templates vary",
+  "official_sources": [
+    {"url": "https://developer.onetrust.com/onetrust/docs/javascript-events-guide", "title": "OneTrust Web CMP Events Guide", "verified_at": "2026-08-18"},
+    {"url": "https://developer.onetrust.com/onetrust/docs/google-tag-manager", "title": "OneTrust Google Tag Manager integration", "verified_at": "2026-08-18"},
+    {"url": "https://my.onetrust.com/articles/en_US/Knowledge/UUID-66bcaaf1-c7ca-5f32-6760-c75a1337c226", "title": "OnetrustActiveGroups data layer object", "verified_at": "2026-08-18"}
+  ],
+  "last_verified_at": "2026-08-18",
+  "detection_signatures": [
+    {"kind": "GLOBAL", "pattern": "OneTrust", "weight": 35},
+    {"kind": "GLOBAL", "pattern": "OnetrustActiveGroups", "weight": 45},
+    {"kind": "SCRIPT_HOST", "pattern": "(^|\\.)cdn\\.cookielaw\\.org$", "weight": 55},
+    {"kind": "SCRIPT_PATH", "pattern": "/scripttemplates/otSDKStub\\.js", "weight": 35},
+    {"kind": "COOKIE_NAME", "pattern": "^(OptanonConsent|OptanonAlertBoxClosed)$", "weight": 35},
+    {"kind": "EVENT", "pattern": "^OneTrust(GroupsUpdated|Loaded|PCLoaded)$", "weight": 20}
+  ],
+  "readiness_signals": ["OneTrustGroupsUpdated observed", "OnetrustActiveGroups populated", "OneTrust global exists"],
+  "state_reader": {
+    "kind": "JAVASCRIPT_EXPRESSION",
+    "expression": "() => { const raw = window.OnetrustActiveGroups; const values = Array.isArray(raw) ? raw : String(raw || '').split(','); return {ready: typeof raw !== 'undefined', active_groups: values.map(v => String(v).trim()).filter(Boolean).sort()}; }",
+    "retained_fields": ["ready", "active category ids"],
+    "prohibited_fields": ["OptanonConsent raw value", "consentId", "geolocation value", "data subject identifiers"]
+  },
+  "semantic_controls": {
+    "accept": {"roles": ["button"], "label_patterns": ["^(accept all cookies|accept all|allow all|tout accepter)$"], "provider_selectors": ["#onetrust-accept-btn-handler"]},
+    "reject": {"roles": ["button", "link"], "label_patterns": ["^(reject all|decline all|tout refuser|continuer sans accepter)$"], "provider_selectors": ["#onetrust-reject-all-handler"]},
+    "preferences": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|manage preferences|customize|parametrer|gerer mes choix)$"], "provider_selectors": ["#onetrust-pc-btn-handler", "#ot-sdk-btn"]},
+    "save": {"roles": ["button"], "label_patterns": ["^(confirm my choices|save choices|save|confirmer mes choix|enregistrer)$"], "provider_selectors": [".save-preference-btn-handler"]},
+    "reopen": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|privacy settings|manage cookies|gerer mes cookies|mes preferences)$"], "provider_selectors": ["#ot-sdk-btn"]},
+    "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(reject all|withdraw|tout refuser|retirer mon consentement)$"], "provider_selectors": ["#onetrust-reject-all-handler"]}
+  },
+  "locales": ["en", "fr"],
+  "api_fallback": {"allowed": false, "documented_method": null, "ux_status_when_used": "NOT_TESTED"},
+  "known_limitations": ["Custom category IDs and bundle groups must not be inferred from default C000x meanings", "Template and auto-blocking variants require differential browser verification"]
+}

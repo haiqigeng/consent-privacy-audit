@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "adapter_id": "didomi-web",
+  "adapter_version": "1.0.0",
+  "provider": "Didomi",
+  "supported_version_range": "Didomi Web SDK public API verified 2026-08-18; exact deployed build may vary",
+  "official_sources": [
+    {"url": "https://developers.didomi.io/cmp/web-sdk/reference/api", "title": "Didomi Web SDK API", "verified_at": "2026-08-18"},
+    {"url": "https://developers.didomi.io/cmp/web-sdk/reference/events", "title": "Didomi Web SDK events", "verified_at": "2026-08-18"},
+    {"url": "https://developers.didomi.io/cmp/web-sdk/consent-notice/cookies", "title": "Didomi cookies and storage", "verified_at": "2026-08-18"}
+  ],
+  "last_verified_at": "2026-08-18",
+  "detection_signatures": [
+    {"kind": "GLOBAL", "pattern": "Didomi", "weight": 50},
+    {"kind": "GLOBAL", "pattern": "didomiOnReady", "weight": 20},
+    {"kind": "SCRIPT_HOST", "pattern": "(^|\\.)privacy-center\\.org$", "weight": 45},
+    {"kind": "COOKIE_NAME", "pattern": "^didomi_(token|dcs)$", "weight": 35},
+    {"kind": "EVENT", "pattern": "^(consent\\.changed|notice\\.|preferences\\.)", "weight": 15}
+  ],
+  "readiness_signals": ["window.Didomi exists", "window.didomiOnReady callback executes"],
+  "state_reader": {
+    "kind": "JAVASCRIPT_EXPRESSION",
+    "expression": "() => { const d = window.Didomi; if (!d || typeof d.getCurrentUserStatus !== 'function') return {ready:false, purposes:[], vendors:[]}; const s = d.getCurrentUserStatus() || {}; const enabled = o => Object.entries(o || {}).filter(([,v]) => v && v.enabled === true).map(([k]) => k).sort(); return {ready:true, purposes:enabled(s.purposes), vendors:enabled(s.vendors)}; }",
+    "retained_fields": ["ready", "enabled purpose ids", "enabled vendor ids"],
+    "prohibited_fields": ["didomi_token", "didomi_dcs", "consent token", "organization user id", "raw remote consent payload"]
+  },
+  "semantic_controls": {
+    "accept": {"roles": ["button"], "label_patterns": ["^(agree and close|accept all|allow all|tout accepter|j.accepte)$"], "provider_selectors": ["#didomi-notice-agree-button"]},
+    "reject": {"roles": ["button", "link"], "label_patterns": ["^(decline|reject all|disagree|tout refuser|continuer sans accepter|je refuse)$"], "provider_selectors": ["#didomi-notice-disagree-button"]},
+    "preferences": {"roles": ["button", "link"], "label_patterns": ["^(learn more|more information|manage preferences|personnaliser|gerer mes choix|en savoir plus)$"], "provider_selectors": ["#didomi-notice-learn-more-button"]},
+    "save": {"roles": ["button"], "label_patterns": ["^(save choices|save|confirm my choices|enregistrer|confirmer mes choix)$"], "provider_selectors": []},
+    "reopen": {"roles": ["button", "link"], "label_patterns": ["^(privacy settings|manage cookies|gerer mes cookies|mes preferences|cookies)$"], "provider_selectors": []},
+    "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(disagree to all|reject all|withdraw|tout refuser|retirer mon consentement)$"], "provider_selectors": []}
+  },
+  "locales": ["en", "fr"],
+  "api_fallback": {"allowed": true, "documented_method": "Didomi.setUserAgreeToAll() or Didomi.setUserDisagreeToAll() after didomiOnReady", "ux_status_when_used": "INCONCLUSIVE"},
+  "known_limitations": ["TCF deployments require TCData state to remain the source of truth", "API fallback cannot certify the visitor-facing notice interaction"]
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/monitoring-baseline.schema.json",
+  "title": "Future consent monitoring baseline",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_run_id", "created_at", "finding_fingerprint_algo_version", "scenario_identities", "finding_fingerprints", "allowed_comparison_fields", "freshness_requirements", "role"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "source_run_id": {"type": "string"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "finding_fingerprint_algo_version": {"const": "finding-fingerprint-jcs-sha256-v1"},
+    "scenario_identities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "finding_fingerprints": {"type": "array", "items": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "uniqueItems": true},
+    "allowed_comparison_fields": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "freshness_requirements": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+    "role": {"const": "FUTURE_INTEGRATION_ONLY"}
+  }
+}

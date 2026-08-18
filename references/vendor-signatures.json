@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0.0",
+  "registry_version": "2026-08-18.1",
+  "last_verified_at": "2026-08-18",
+  "products": [
+    {"vendor_id": "google", "product_id": "google-tag-manager", "display_name": "Google Tag Manager", "purpose_candidate": "TAG_MANAGER", "host_patterns": ["(^|\\.)googletagmanager\\.com$"], "path_patterns": ["/gtm\\.js", "/gtag/js"], "source_url": "https://developers.google.com/tag-platform/tag-manager/web"},
+    {"vendor_id": "google", "product_id": "google-analytics", "display_name": "Google Analytics", "purpose_candidate": "ANALYTICS", "host_patterns": ["(^|\\.)google-analytics\\.com$", "(^|\\.)analytics\\.google\\.com$"], "path_patterns": ["/g/collect", "/collect"], "source_url": "https://developers.google.com/analytics/devguides/collection/protocol/ga4"},
+    {"vendor_id": "google", "product_id": "google-ads", "display_name": "Google Ads / Floodlight", "purpose_candidate": "ADVERTISING", "host_patterns": ["(^|\\.)googleadservices\\.com$", "(^|\\.)doubleclick\\.net$"], "path_patterns": ["/pagead/", "/activity", "/viewthroughconversion/"], "source_url": "https://developers.google.com/tag-platform/devguides"},
+    {"vendor_id": "meta", "product_id": "meta-pixel", "display_name": "Meta Pixel", "purpose_candidate": "ADVERTISING", "host_patterns": ["(^|\\.)connect\\.facebook\\.net$", "(^|\\.)facebook\\.com$"], "path_patterns": ["/fbevents\\.js", "/tr/?"], "source_url": "https://developers.facebook.com/docs/meta-pixel/"},
+    {"vendor_id": "microsoft", "product_id": "microsoft-clarity", "display_name": "Microsoft Clarity", "purpose_candidate": "ANALYTICS", "host_patterns": ["(^|\\.)clarity\\.ms$"], "path_patterns": ["/tag/", "/collect"], "source_url": "https://learn.microsoft.com/clarity/setup-and-installation/clarity-setup"},
+    {"vendor_id": "hotjar", "product_id": "hotjar", "display_name": "Hotjar", "purpose_candidate": "ANALYTICS", "host_patterns": ["(^|\\.)hotjar\\.com$", "(^|\\.)hotjar\\.io$"], "path_patterns": [".*"], "source_url": "https://help.hotjar.com/hc/en-us/articles/115011789248-How-to-Install-Your-Hotjar-Tracking-Code"},
+    {"vendor_id": "linkedin", "product_id": "linkedin-insight", "display_name": "LinkedIn Insight Tag", "purpose_candidate": "ADVERTISING", "host_patterns": ["(^|\\.)licdn\\.com$", "(^|\\.)ads\\.linkedin\\.com$"], "path_patterns": ["/li\\.lms-analytics/insight\\.min\\.js", "/collect"], "source_url": "https://www.linkedin.com/help/lms/answer/a427660"},
+    {"vendor_id": "tiktok", "product_id": "tiktok-pixel", "display_name": "TikTok Pixel", "purpose_candidate": "ADVERTISING", "host_patterns": ["(^|\\.)analytics\\.tiktok\\.com$"], "path_patterns": ["/i18n/pixel", "/api/v.*/pixel"], "source_url": "https://ads.tiktok.com/help/article/get-started-pixel"},
+    {"vendor_id": "axeptio", "product_id": "axeptio-cmp", "display_name": "Axeptio CMP", "purpose_candidate": "CMP", "host_patterns": ["(^|\\.)axept\\.io$", "(^|\\.)axeptio\\.eu$"], "path_patterns": [".*"], "source_url": "https://support.axeptio.eu/en/articles/274036-axeptio-javascript-sdk"},
+    {"vendor_id": "didomi", "product_id": "didomi-cmp", "display_name": "Didomi CMP", "purpose_candidate": "CMP", "host_patterns": ["(^|\\.)privacy-center\\.org$", "(^|\\.)didomi\\.io$"], "path_patterns": [".*"], "source_url": "https://developers.didomi.io/cmp/web-sdk"},
+    {"vendor_id": "onetrust", "product_id": "onetrust-cmp", "display_name": "OneTrust CMP", "purpose_candidate": "CMP", "host_patterns": ["(^|\\.)cookielaw\\.org$", "(^|\\.)onetrust\\.com$"], "path_patterns": [".*"], "source_url": "https://developer.onetrust.com/onetrust/docs/javascript-events-guide"}
+  ]
+}

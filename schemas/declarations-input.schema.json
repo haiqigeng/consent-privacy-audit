@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/declarations-input.schema.json",
+  "title": "Normalized public tracker declarations supplied to the audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sources"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "retrieved_at", "items"],
+        "properties": {
+          "url": {"type": "string", "format": "uri"},
+          "retrieved_at": {"type": "string", "format": "date-time"},
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["declaration_id", "display_name", "vendor_id", "product_id", "aliases", "purpose_text", "purpose_category", "category_text", "duration_text"],
+              "properties": {
+                "declaration_id": {"type": "string"},
+                "display_name": {"type": "string", "minLength": 1},
+                "vendor_id": {"type": ["string", "null"]},
+                "product_id": {"type": ["string", "null"]},
+                "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+                "purpose_text": {"type": ["string", "null"], "maxLength": 2000},
+                "purpose_category": {"type": ["string", "null"], "enum": ["ADVERTISING", "PERSONALIZATION", "ANALYTICS", "FUNCTIONAL", "SECURITY", "CMP", "TAG_MANAGER", "UNKNOWN", null]},
+                "category_text": {"type": ["string", "null"], "maxLength": 1000},
+                "duration_text": {"type": ["string", "null"], "maxLength": 1000}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

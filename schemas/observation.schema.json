@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/schemas/consent-privacy-audit/observation.schema.json",
+  "title": "Minimized consent runtime observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "observation_id", "run_id", "scenario_id", "scenario_class",
+    "action_window", "observed_at", "page_url", "surface", "fact_class",
+    "technical_test_status", "rule_applicability", "vendor_product", "purpose_candidate",
+    "observed_initiator", "suspected_implementation_layer", "data", "evidence_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "observation_id": {"type": "string", "pattern": "^OBS-[A-Za-z0-9._-]+$"},
+    "run_id": {"type": "string"},
+    "scenario_id": {"type": "string"},
+    "scenario_class": {"enum": ["UNTOUCHED", "REJECTED", "ACCEPTED", "ACCEPTED_TO_WITHDRAWN", "PERSISTENCE_ACCEPTED", "PERSISTENCE_REJECTED", "GRANULAR_DENIED", "REJECTED_TO_ACCEPTED"]},
+    "action_window": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "page_url": {"type": "string", "format": "uri"},
+    "surface": {"enum": ["NETWORK", "COOKIE", "STORAGE", "SCRIPT", "EMBED", "CMP_STATE", "CONSENT_SIGNAL", "VISUAL", "DOM", "CANARY", "SERVICE_WORKER"]},
+    "fact_class": {"enum": ["BROWSER_OBSERVED", "ADMIN_EVIDENCED", "CLIENT_ASSERTED", "UNOBSERVABLE"]},
+    "technical_test_status": {"enum": ["EXPECTED_BEHAVIOUR_OBSERVED", "UNEXPECTED_BEHAVIOUR_OBSERVED", "INCONCLUSIVE", "NOT_APPLICABLE", "NOT_TESTED"]},
+    "rule_applicability": {"enum": ["CONFIRMED", "CLIENT_ASSERTED", "REQUIRES_DPO_CONFIRMATION", "NOT_APPLICABLE", "UNKNOWN"]},
+    "vendor_product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vendor_id", "product_id", "display_name", "confidence"],
+      "properties": {
+        "vendor_id": {"type": ["string", "null"]},
+        "product_id": {"type": ["string", "null"]},
+        "display_name": {"type": "string"},
+        "confidence": {"enum": ["CONFIRMED", "PROBABLE", "UNKNOWN", "CONFLICTING"]}
+      }
+    },
+    "purpose_candidate": {"enum": ["ADVERTISING", "PERSONALIZATION", "ANALYTICS", "FUNCTIONAL", "SECURITY", "CMP", "TAG_MANAGER", "UNKNOWN"]},
+    "observed_initiator": {"type": ["string", "null"], "maxLength": 1000},
+    "suspected_implementation_layer": {"enum": ["GTM_CONTAINER", "OTHER_TAG_MANAGER", "HARDCODED_OR_BUNDLED", "CMS_THEME_PLUGIN", "EMBED_OR_IFRAME", "CMP", "SERVICE_WORKER", "FIRST_PARTY_PROXY_OR_GATEWAY", "POLICY_OR_ORGANIZATIONAL", "UNKNOWN"]},
+    "data": {"type": "object"},
+    "evidence_id": {"type": "string", "pattern": "^EVD-[A-Za-z0-9._-]+$"}
+  }
+}
