@@ -211,7 +211,7 @@ def registrable_domain(host: str) -> str:
 
 
 def normalize_path_template(path: str) -> str:
-    path = UUID_RE.sub("{uuid}", path or "/")
+    path = PHONE_RE.sub("{redacted}", UUID_RE.sub("{uuid}", path or "/"))
     segments: list[str] = []
     for segment in path.split("/"):
         if not segment:

@@ -199,6 +199,8 @@ class CmpTests(unittest.TestCase):
         safe, names = sanitize_url("https://example.test/app.js?v=20250430123045")
         self.assertEqual("https://example.test/app.js?v=%3Credacted%3E", safe)
         self.assertEqual(["v"], names)
+        safe_path, _ = sanitize_url("https://example.test/getattachment/123e4567-e89b-12d3-a456-426614174000/istock-12345678901234.jpg")
+        self.assertNotIn("12345678901234", safe_path)
 
     def test_cdp_initiator_prefers_gtm_in_the_actual_stack(self) -> None:
         value = extract_cdp_initiator(
