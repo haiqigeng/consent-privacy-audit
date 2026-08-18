@@ -268,6 +268,8 @@ class SafetyTests(unittest.TestCase):
         self.assertNotIn("PHONE", privacy_findings('{"expires": 1767225600000}'))
         self.assertNotIn("PHONE", privacy_findings('{"expires": 1767225600}'))
         self.assertIn("PHONE", privacy_findings('{"phone": 1767225600}'))
+        escaped_observations = json.dumps('{"expires": 1767225600}')
+        self.assertNotIn("PHONE", privacy_findings(escaped_observations))
         with self.assertRaises(PrivacyError):
             review_text("visible synthetic-test-canary", ["synthetic-test-canary"])
         review_text("Cookie settings", ["synthetic-test-canary"])

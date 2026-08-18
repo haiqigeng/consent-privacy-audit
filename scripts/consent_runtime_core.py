@@ -572,7 +572,7 @@ def privacy_findings(text: str, *, canaries: Iterable[str] = ()) -> list[str]:
     for match in PHONE_RE.finditer(text):
         candidate = match.group(0).strip()
         digits_only = candidate.isdigit()
-        expiry_prefix = text[max(0, match.start() - 80):match.start()]
+        expiry_prefix = text[max(0, match.start() - 80):match.start()].replace('\\"', '"').replace("\\'", "'")
         is_expiry_metadata = bool(
             re.search(
                 r'"(?:expires|expiry|expiration|expires_at|expiresAt)"\s*:\s*["\']?$',
