@@ -26,6 +26,10 @@ from consent_runtime_core import (
     write_jsonl,
 )
 
+REQUIRED_CORE_SCENARIO_IDS = frozenset(
+    {"SCN-UNTOUCHED", "SCN-REJECTED", "SCN-ACCEPTED", "SCN-WITHDRAWAL", "SCN-PERSIST-ACCEPTED", "SCN-PERSIST-REJECTED"}
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Capture minimized consent runtime observations with Playwright Chromium.")
@@ -39,6 +43,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--later-ms", type=int, default=2500, help="Fixed post-choice horizon kept separate from the immediate quiet window")
     parser.add_argument("--screenshot-staging", type=Path)
     return parser.parse_args()
+
+
+def incomplete_required_scenarios(scenarios: list[dict[str, Any]]) -> list[str]:
+    return sorted(
+        str(item["scenario_id"])
+        for item in scenarios
+        if item.get("scenario_id") in REQUIRED_CORE_SCENARIO_IDS and item.get("status") != "COMPLETE"
+    )
 
 
 def safe_get(obj: Any, name: str, default: Any = None) -> Any:
@@ -488,6 +500,37 @@ def click_control(page: Any, adapter: dict[str, Any], action: str) -> tuple[bool
         return False, f"{method} click failed: {type(exc).__name__}"
 
 
+def click_reopen_with_public_fallback(
+    *, page: Any, run: dict[str, Any], adapter: dict[str, Any], recorder: NetworkRecorder,
+    quiet_ms: int, timeout_ms: int,
+) -> tuple[bool, str]:
+    """Retry a missing persistent control on declared public privacy surfaces.
+
+    A CMP preference control may be intentionally absent from the landing page but
+    available on the linked cookie policy. This remains a browser/UI interaction:
+    no provider API or undocumented storage mutation is used.
+    """
+    ok, method = click_control(page, adapter, "reopen")
+    if ok:
+        return True, method
+    attempted: list[str] = []
+    for raw_url in run.get("scope", {}).get("declaration_urls", []):
+        safe_url, _ = sanitize_url(str(raw_url))
+        if not safe_url or safe_url in attempted:
+            continue
+        attempted.append(safe_url)
+        try:
+            page.goto(str(raw_url), wait_until="domcontentloaded", timeout=timeout_ms)
+            recorder.wait_quiet(page, quiet_ms=quiet_ms, timeout_ms=timeout_ms)
+            reopened, reopen_method = click_control(page, adapter, "reopen")
+            if reopened:
+                return True, f"public-declaration:{safe_url}:{reopen_method}"
+        except Exception:
+            continue
+    suffix = ",".join(attempted) if attempted else "none"
+    return False, f"{method}; public-declaration-fallback-exhausted:{suffix}"
+
+
 def storage_metadata(page: Any, context: Any) -> dict[str, Any]:
     cookies = []
     for item in context.cookies():
@@ -834,7 +877,17 @@ def execute_scenario(
         transition_states_verified = True
         for index, action in enumerate(transition_actions):
             cursor = recorder.cursor()
-            ok, method = click_control(page, adapter, action)
+            if action == "reopen":
+                ok, method = click_reopen_with_public_fallback(
+                    page=page,
+                    run=run,
+                    adapter=adapter,
+                    recorder=recorder,
+                    quiet_ms=quiet_ms,
+                    timeout_ms=timeout_ms,
+                )
+            else:
+                ok, method = click_control(page, adapter, action)
             if not ok:
                 limitations.append(f"{action}: {method}")
                 scenario["status"] = "INCONCLUSIVE"
@@ -1135,7 +1188,13 @@ def main() -> int:
                 "interaction_method": "UI",
                 "limitations": [] if len(ids) == 1 else ["CMP detection changed across scenario contexts"],
             }
-        run["status"] = "COMPLETE"
+        incomplete_required = incomplete_required_scenarios(run["scenarios"])
+        if incomplete_required:
+            run["status"] = "INCONCLUSIVE"
+            run["abort_reason"] = "Required core scenario(s) did not complete: " + ", ".join(sorted(incomplete_required))
+            run["overall_technical_outcome"] = "MATERIAL_TESTS_INCONCLUSIVE"
+        else:
+            run["status"] = "COMPLETE"
         run["completed_at"] = utc_now()
         run["outputs"]["observations"] = {"path": str(args.output.name), "sha256": None}
         from consent_runtime_core import sha256_file
@@ -1143,6 +1202,9 @@ def main() -> int:
         run["outputs"]["observations"]["sha256"] = sha256_file(args.output)
         validate_schema(run, "audit-run.schema.json", label=str(args.run))
         write_json(args.run, run)
+        if incomplete_required:
+            print(f"ERROR {run['abort_reason']}", file=sys.stderr)
+            return 2
     except Exception as exc:
         try:
             abort_run(args.run, run, f"{type(exc).__name__}: {exc}")

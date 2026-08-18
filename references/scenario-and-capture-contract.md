@@ -4,7 +4,7 @@
 
 Create one new browser context per independent scenario. Keep one context inside an accept-to-withdraw or reject-to-accept transition. Use dedicated persistence contexts. Never carry authentication, cache, cookies, storage, or service workers unintentionally.
 
-If isolation or resulting state cannot be proved, mark affected tests `INCONCLUSIVE`; do not infer state from a banner click alone.
+If isolation or resulting state cannot be proved, mark the affected observation `INCONCLUSIVE`; do not infer state from a banner click alone. For a missing withdrawal/reopen control, first visit each registered public cookie/privacy URL and retry the visible UI. If a required core scenario remains inconclusive after that recovery, the run is incomplete and must not be delivered as `COMPLETE`.
 
 ## Required execution
 

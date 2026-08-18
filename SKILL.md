@@ -40,8 +40,8 @@ Observe what the deployed public site sends, stores, loads, and signals under ea
 2. Initialize `audit-run.json`. Register all required scenarios before browser activity.
 3. Verify every selected rule source. Only `MATCHED` and non-stale sources can support rule evaluation; otherwise make only dependent rules `INCONCLUSIVE`.
 4. Establish the controlled browser and capture readiness. Abort rather than improvise when readiness fails.
-5. Detect the CMP with weighted signatures. Prefer real UI, semantic roles, and visible localized labels; use provider selectors only as fallback.
-6. Execute isolated untouched, rejected, accepted, accepted-to-withdrawn, accepted-persistence, and rejected-persistence scenarios. Add granular/reject-to-accept only when applicable.
+5. Detect the CMP with weighted signatures. Prefer real UI, semantic roles, and visible localized labels; use provider selectors only as fallback. For a missing persistent control, exhaust the registered public declaration URLs before treating the scenario as incomplete.
+6. Execute isolated untouched, rejected, accepted, accepted-to-withdrawn, accepted-persistence, and rejected-persistence scenarios. Add granular/reject-to-accept only when applicable. An `INCONCLUSIVE` required core scenario is an incomplete run, not an acceptable completed delivery; preserve the diagnostic evidence, but do not issue a `COMPLETE` report until the scenario is rerun successfully or explicitly marked `NOT_TESTED` with the required handoff.
 7. Capture minimized network, cookie/storage metadata, scripts/embeds, service workers, consent state/timing, initiators, safe DOM, and approved screenshot evidence.
 8. Normalize observations, compare scenarios, build technical findings, and run the narrow public declaration diff.
 9. Build the Markdown, XLSX, evidence index, manual remediation handoff, optional supporting-only recette handoff, and future-only monitoring baseline from validated canonical artifacts.
@@ -58,7 +58,7 @@ Classify every material fact as exactly one of:
 - `CLIENT_ASSERTED`
 - `UNOBSERVABLE`
 
-Use one bounded technical status:
+Use one bounded technical status for individual observations and findings:
 
 - `EXPECTED_BEHAVIOUR_OBSERVED`
 - `UNEXPECTED_BEHAVIOUR_OBSERVED`
@@ -66,14 +66,14 @@ Use one bounded technical status:
 - `NOT_APPLICABLE`
 - `NOT_TESTED`
 
-Record rule applicability separately as `CONFIRMED`, `CLIENT_ASSERTED`, `REQUIRES_DPO_CONFIRMATION`, `NOT_APPLICABLE`, or `UNKNOWN`.
+Record rule applicability separately as `CONFIRMED`, `CLIENT_ASSERTED`, `REQUIRES_DPO_CONFIRMATION`, `NOT_APPLICABLE`, or `UNKNOWN`. `INCONCLUSIVE` is never a pass result and cannot coexist with a `COMPLETE` run for a required core scenario.
 
 ## Required scenarios
 
 - `UNTOUCHED`: fresh context, no banner action, bounded quiet window, second page or route, and verification that no implicit choice appeared.
 - `REJECTED`: fresh context, real reject UI, verified state, immediate and later browser behavior.
 - `ACCEPTED`: fresh context, real accept UI, verified state, immediate and later browser behavior.
-- `ACCEPTED_TO_WITHDRAWN`: same context, reopen preferences, withdraw, verify state, then capture continued immediate and later activity.
+- `ACCEPTED_TO_WITHDRAWN`: same context, reopen preferences, withdraw, verify state, then capture continued immediate and later activity. If the persistent control is not visible on the landing page, navigate through each registered public declaration URL and retry the visible UI before recording an incomplete scenario.
 - `PERSISTENCE_ACCEPTED` and `PERSISTENCE_REJECTED`: separate prepared contexts, reload/revisit, and compare retained state and behavior.
 
 Never carry context across independent scenarios. API fallback cannot certify banner UX. Never fabricate TCF strings or edit undocumented consent cookies.

@@ -89,12 +89,15 @@ If 1–5 fail, write an `ABORTED` manifest and stop. If a source check fails, co
 
 Build the sample from supplied journeys plus rendered route templates, critical public paths, embeds, vendor-triggering interactions, CMP/locale variants, second-page or SPA transitions, and realistic activation opportunities for declared vendors. Comparable scenarios use the same normalized sample. Every candidate is tested, excluded, blocked, or unresolved.
 
+When a required CMP control is not found on the landing page, inspect the registered public cookie/privacy URLs and retry the visible UI before recording an unresolved scenario. An unresolved required core scenario is an incomplete run; it cannot be packaged as a `COMPLETE` delivery.
+
 ## Delivery gate
 
 Delivery is valid only when:
 
 - schemas and cross-file identities validate;
 - every scenario/capture surface has a status;
+- every required core scenario is `COMPLETE` with `state_verified=true` (an `INCONCLUSIVE` required scenario blocks delivery);
 - source checks and applicability are visible;
 - no raw HAR, body, cookie value, token, credential, canary, or real identifier leaked;
 - screenshot evidence has crop/mask, OCR/text, and analyst approval;

@@ -28,7 +28,7 @@ from consent_runtime_core import (  # noqa: E402
 )
 from consent_runtime_core import read_json, write_json  # noqa: E402
 from review_screenshot_evidence import main as screenshot_main, review_text  # noqa: E402
-from scan_consent_runtime import detect_canary_path, execute_interaction_plan, extract_cdp_initiator, find_control, state_matches_action, websocket_observations  # noqa: E402
+from scan_consent_runtime import detect_canary_path, execute_interaction_plan, extract_cdp_initiator, find_control, incomplete_required_scenarios, state_matches_action, websocket_observations  # noqa: E402
 from verify_rule_sources import verify  # noqa: E402
 
 
@@ -158,6 +158,16 @@ class CmpTests(unittest.TestCase):
         control, method = find_control(SemanticPage(["Accepter tout"]), adapter, "accept")
         self.assertIsNotNone(control)
         self.assertTrue(method.startswith("semantic"))
+
+    def test_onetrust_cookie_settings_label_is_found_semantically(self) -> None:
+        adapter = next(item for item in __import__("consent_runtime_core").load_adapters() if item["adapter_id"] == "onetrust-web")
+        control, method = find_control(SemanticPage(["Paramètres des cookies"]), adapter, "reopen")
+        self.assertIsNotNone(control)
+        self.assertTrue(method.startswith("semantic"))
+
+    def test_incomplete_required_scenario_blocks_complete_run(self) -> None:
+        scenarios = [{"scenario_id": "SCN-UNTOUCHED", "status": "COMPLETE"}, {"scenario_id": "SCN-WITHDRAWAL", "status": "INCONCLUSIVE"}]
+        self.assertEqual(["SCN-WITHDRAWAL"], incomplete_required_scenarios(scenarios))
 
     def test_known_cmp_requires_weighted_multisignal_evidence(self) -> None:
         snapshot = {"globals": ["Didomi"], "script_hosts": ["sdk.privacy-center.org"], "script_paths": [], "cookie_names": [], "storage_keys": [], "dom_markers": [], "events": []}

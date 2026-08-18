@@ -33,4 +33,4 @@ Capture untouched behavior, discover rendered controls, interact only when unamb
 
 ## API fallback
 
-API fallback may test downstream behavior but cannot certify UI choice, banner accessibility, or end-to-end consent interaction. Mark those tests `INCONCLUSIVE` or `NOT_TESTED`, disclose method/values/timing, and independently verify resulting state.
+API fallback may test downstream behavior but cannot certify UI choice, banner accessibility, or end-to-end consent interaction. Mark those tests `INCONCLUSIVE` or `NOT_TESTED`, disclose method/values/timing, and independently verify resulting state. Before accepting an unavailable persistent UI control as incomplete, retry the visible control on every registered public declaration URL. A required core scenario that remains `INCONCLUSIVE` blocks a `COMPLETE` delivery.

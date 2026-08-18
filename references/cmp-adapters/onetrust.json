@@ -28,9 +28,9 @@
   "semantic_controls": {
     "accept": {"roles": ["button"], "label_patterns": ["^(accept all cookies|accept all|allow all|tout accepter)$"], "provider_selectors": ["#onetrust-accept-btn-handler"]},
     "reject": {"roles": ["button", "link"], "label_patterns": ["^(reject all|decline all|tout refuser|continuer sans accepter)$"], "provider_selectors": ["#onetrust-reject-all-handler"]},
-    "preferences": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|manage preferences|customize|parametrer|gerer mes choix)$"], "provider_selectors": ["#onetrust-pc-btn-handler", "#ot-sdk-btn"]},
-    "save": {"roles": ["button"], "label_patterns": ["^(confirm my choices|save choices|save|confirmer mes choix|enregistrer)$"], "provider_selectors": [".save-preference-btn-handler"]},
-    "reopen": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|privacy settings|manage cookies|gerer mes cookies|mes preferences)$"], "provider_selectors": ["#ot-sdk-btn"]},
+    "preferences": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|cookies settings|manage preferences|customize|parametrer|parametres des cookies|gerer mes choix|cookie-instellingen|cookie-einstellungen)$"], "provider_selectors": ["#onetrust-pc-btn-handler", ".ot-sdk-show-settings", "#ot-sdk-btn"]},
+    "save": {"roles": ["button"], "label_patterns": ["^(confirm my choices|save choices|save|confirmer mes choix|enregistrer|confirm my choices)$"], "provider_selectors": [".save-preference-btn-handler"]},
+    "reopen": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|cookies settings|privacy settings|manage cookies|gerer mes cookies|mes preferences|parametres des cookies|cookie-instellingen|cookie-einstellungen)$"], "provider_selectors": ["#onetrust-pc-btn-handler", ".ot-sdk-show-settings", "#ot-sdk-btn"]},
     "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(reject all|withdraw|tout refuser|retirer mon consentement)$"], "provider_selectors": ["#onetrust-reject-all-handler"]}
   },
   "locales": ["en", "fr"],
