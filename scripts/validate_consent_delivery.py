@@ -15,6 +15,8 @@ from consent_runtime_core import (
     IDENTITY_NORMALIZATION_VERSION,
     PRIORITY_RUBRIC_VERSION,
     PrivacyError,
+    REQUIRED_CORE_SCENARIOS,
+    REQUIRED_CORE_SCENARIO_CLASSES,
     SCHEMA_DIR,
     assert_privacy_safe,
     finding_fingerprint,
@@ -206,7 +208,28 @@ def validate_delivery(directory: Path, canaries: list[str]) -> list[str]:
         if any(source_status.get(source_id) != "MATCHED" for source_id in finding["rule_source_ids"]):
             if finding["technical_test_status"] not in {"INCONCLUSIVE", "NOT_APPLICABLE", "NOT_TESTED"}:
                 raise ContractError(f"Finding claims a conclusive rule result from an unverified source: {finding['finding_fingerprint']}")
-    core = {"UNTOUCHED", "REJECTED", "ACCEPTED", "ACCEPTED_TO_WITHDRAWN", "PERSISTENCE_ACCEPTED", "PERSISTENCE_REJECTED"}
+    scenario_ids = [str(scenario["scenario_id"]) for scenario in run["scenarios"]]
+    if len(scenario_ids) != len(set(scenario_ids)):
+        raise ContractError("Delivery contains duplicate scenario IDs")
+    scenario_by_id = {str(scenario["scenario_id"]): scenario for scenario in run["scenarios"]}
+    missing_ids = sorted(set(scenario_id for scenario_id, _ in REQUIRED_CORE_SCENARIOS) - set(scenario_by_id))
+    if missing_ids:
+        raise ContractError(f"Delivery is missing required core scenario ID(s): {missing_ids}")
+    mismatched_ids = sorted(
+        scenario_id
+        for scenario_id, expected_class in REQUIRED_CORE_SCENARIOS
+        if scenario_by_id[scenario_id]["scenario_class"] != expected_class
+    )
+    if mismatched_ids:
+        raise ContractError(f"Delivery has a core scenario ID/class mismatch: {mismatched_ids}")
+    core = REQUIRED_CORE_SCENARIO_CLASSES
+    observed_core = [scenario for scenario in run["scenarios"] if scenario["scenario_class"] in core]
+    observed_classes = {scenario["scenario_class"] for scenario in observed_core}
+    missing_core = sorted(core - observed_classes)
+    if missing_core:
+        raise ContractError(f"Delivery is missing required core scenario(s): {missing_core}")
+    if len(observed_core) != len(observed_classes):
+        raise ContractError("Delivery contains duplicate required core scenario classes")
     state_gap_classes = {item["fingerprint_inputs"]["scenario_class"] for item in findings if item["finding_kind"] == "STATE_VERIFICATION_GAP"}
     for scenario in run["scenarios"]:
         if any(status == "REGISTERED" for status in scenario["capture_status"].values()):

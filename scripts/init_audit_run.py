@@ -9,6 +9,7 @@ from consent_runtime_core import (
     FINGERPRINT_ALGO_VERSION,
     IDENTITY_NORMALIZATION_VERSION,
     PRIORITY_RUBRIC_VERSION,
+    REQUIRED_CORE_SCENARIOS,
     ROOT,
     SCENARIO_CONTRACT_VERSION,
     ContractError,
@@ -19,16 +20,6 @@ from consent_runtime_core import (
     validate_schema,
     write_json,
 )
-
-
-CORE_SCENARIOS = [
-    ("SCN-UNTOUCHED", "UNTOUCHED"),
-    ("SCN-REJECTED", "REJECTED"),
-    ("SCN-ACCEPTED", "ACCEPTED"),
-    ("SCN-WITHDRAWAL", "ACCEPTED_TO_WITHDRAWN"),
-    ("SCN-PERSIST-ACCEPTED", "PERSISTENCE_ACCEPTED"),
-    ("SCN-PERSIST-REJECTED", "PERSISTENCE_REJECTED"),
-]
 
 
 def parse_args() -> argparse.Namespace:
@@ -105,7 +96,7 @@ def build(intake: dict) -> dict:
             "capture_status": {key: "REGISTERED" for key in ["network", "cookies", "storage", "cmp_state", "scripts_embeds", "screenshot", "attribution", "service_workers"]},
             "limitations": [],
         }
-        for scenario_id, scenario_class in CORE_SCENARIOS
+        for scenario_id, scenario_class in REQUIRED_CORE_SCENARIOS
     ]
     for conditional in intake.get("conditional_scenarios", []):
         scenario_class = str(conditional)

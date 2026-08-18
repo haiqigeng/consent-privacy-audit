@@ -31,6 +31,20 @@ TEXT_NORMALIZATION_VERSION = "visible-text-nfc-whitespace-v1"
 IDENTITY_NORMALIZATION_VERSION = "vendor-path-normalization-v1"
 SCENARIO_CONTRACT_VERSION = "consent-scenarios-v1"
 
+# These six scenarios form the non-optional v1 comparison set. Keep the IDs
+# stable because rescans and delivery validation use them as cross-file
+# identities, not merely as display labels.
+REQUIRED_CORE_SCENARIOS = (
+    ("SCN-UNTOUCHED", "UNTOUCHED"),
+    ("SCN-REJECTED", "REJECTED"),
+    ("SCN-ACCEPTED", "ACCEPTED"),
+    ("SCN-WITHDRAWAL", "ACCEPTED_TO_WITHDRAWN"),
+    ("SCN-PERSIST-ACCEPTED", "PERSISTENCE_ACCEPTED"),
+    ("SCN-PERSIST-REJECTED", "PERSISTENCE_REJECTED"),
+)
+REQUIRED_CORE_SCENARIO_IDS = frozenset(item[0] for item in REQUIRED_CORE_SCENARIOS)
+REQUIRED_CORE_SCENARIO_CLASSES = frozenset(item[1] for item in REQUIRED_CORE_SCENARIOS)
+
 TECHNICAL_STATUSES = {
     "EXPECTED_BEHAVIOUR_OBSERVED",
     "UNEXPECTED_BEHAVIOUR_OBSERVED",

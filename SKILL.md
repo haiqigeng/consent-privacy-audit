@@ -5,6 +5,8 @@ description: Audit deployed public websites for browser-observed consent and tra
 
 # Consent Privacy Audit
 
+Version: `1.0.10`
+
 ## North star
 
 Observe what the deployed public site sends, stores, loads, and signals under each tested visitor choice. Compare only with a current, mechanically verified, applicable technical or jurisdiction/client rule profile. Produce sanitized technical findings and owner routes without claiming legal compliance or changing the implementation.
@@ -32,7 +34,7 @@ Observe what the deployed public site sends, stores, loads, and signals under ea
 | Public declarations and cross-skill artifacts | [declaration and handoff contract](references/declaration-and-handoff-contract.md) |
 | Applying neutral/CNIL profiles or refreshing sources | [source verification and profiles](references/source-verification-and-profiles.md) |
 | Provider detection, semantic controls, or fallback | [CMP adapter contract](references/cmp-adapter-contract.md) and only the detected adapter JSON |
-| Maintaining or releasing this skill | [forward test matrix](tests/FORWARD-TEST-MATRIX.md) |
+| Maintaining or releasing this skill | [maintenance and release](references/maintenance-and-release.md) and [forward test matrix](tests/FORWARD-TEST-MATRIX.md) |
 
 ## One adaptive workflow
 
@@ -41,7 +43,7 @@ Observe what the deployed public site sends, stores, loads, and signals under ea
 3. Verify every selected rule source. Only `MATCHED` and non-stale sources can support rule evaluation; otherwise make only dependent rules `INCONCLUSIVE`.
 4. Establish the controlled browser and capture readiness. Abort rather than improvise when readiness fails.
 5. Detect the CMP with weighted signatures. Prefer real UI, semantic roles, and visible localized labels; use provider selectors only as fallback. For a missing persistent control, exhaust the registered public declaration URLs before treating the scenario as incomplete.
-6. Execute isolated untouched, rejected, accepted, accepted-to-withdrawn, accepted-persistence, and rejected-persistence scenarios. Add granular/reject-to-accept only when applicable. An `INCONCLUSIVE` required core scenario is an incomplete run, not an acceptable completed delivery; preserve the diagnostic evidence, but do not issue a `COMPLETE` report until the scenario is rerun successfully or explicitly marked `NOT_TESTED` with the required handoff.
+6. Execute the six required core scenarios: untouched, rejected, accepted, accepted-to-withdrawn, accepted persistence, and rejected persistence. Add granular/reject-to-accept only when applicable. An `INCONCLUSIVE` or `NOT_TESTED` required core scenario is diagnostic evidence only and blocks a `COMPLETE` delivery until the scenario is rerun successfully; record the smallest missing-evidence handoff.
 7. Capture minimized network, cookie/storage metadata, scripts/embeds, service workers, consent state/timing, initiators, safe DOM, and approved screenshot evidence.
 8. Normalize observations, compare scenarios, build technical findings, and run the narrow public declaration diff.
 9. Build the Markdown, XLSX, evidence index, manual remediation handoff, optional supporting-only recette handoff, and future-only monitoring baseline from validated canonical artifacts.

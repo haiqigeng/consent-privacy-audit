@@ -167,7 +167,10 @@ class CmpTests(unittest.TestCase):
 
     def test_incomplete_required_scenario_blocks_complete_run(self) -> None:
         scenarios = [{"scenario_id": "SCN-UNTOUCHED", "status": "COMPLETE"}, {"scenario_id": "SCN-WITHDRAWAL", "status": "INCONCLUSIVE"}]
-        self.assertEqual(["SCN-WITHDRAWAL"], incomplete_required_scenarios(scenarios))
+        self.assertEqual(
+            ["SCN-ACCEPTED", "SCN-PERSIST-ACCEPTED", "SCN-PERSIST-REJECTED", "SCN-REJECTED", "SCN-WITHDRAWAL"],
+            incomplete_required_scenarios(scenarios),
+        )
 
     def test_known_cmp_requires_weighted_multisignal_evidence(self) -> None:
         snapshot = {"globals": ["Didomi"], "script_hosts": ["sdk.privacy-center.org"], "script_paths": [], "cookie_names": [], "storage_keys": [], "dom_markers": [], "events": []}

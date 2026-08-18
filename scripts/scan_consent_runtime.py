@@ -17,6 +17,7 @@ from consent_runtime_core import (
     infer_implementation_layer,
     load_adapters,
     normalize_label,
+    REQUIRED_CORE_SCENARIO_IDS,
     read_json,
     sanitize_url,
     stable_id,
@@ -25,11 +26,6 @@ from consent_runtime_core import (
     write_json,
     write_jsonl,
 )
-
-REQUIRED_CORE_SCENARIO_IDS = frozenset(
-    {"SCN-UNTOUCHED", "SCN-REJECTED", "SCN-ACCEPTED", "SCN-WITHDRAWAL", "SCN-PERSIST-ACCEPTED", "SCN-PERSIST-REJECTED"}
-)
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Capture minimized consent runtime observations with Playwright Chromium.")
@@ -46,10 +42,15 @@ def parse_args() -> argparse.Namespace:
 
 
 def incomplete_required_scenarios(scenarios: list[dict[str, Any]]) -> list[str]:
-    return sorted(
-        str(item["scenario_id"])
+    status_by_id = {
+        str(item.get("scenario_id")): str(item.get("status"))
         for item in scenarios
-        if item.get("scenario_id") in REQUIRED_CORE_SCENARIO_IDS and item.get("status") != "COMPLETE"
+        if item.get("scenario_id")
+    }
+    return sorted(
+        scenario_id
+        for scenario_id in REQUIRED_CORE_SCENARIO_IDS
+        if status_by_id.get(scenario_id) != "COMPLETE"
     )
 
 

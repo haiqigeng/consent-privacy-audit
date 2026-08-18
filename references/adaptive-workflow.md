@@ -36,7 +36,8 @@ python -B scripts/init_audit_run.py intake.json -o delivery/audit-run.json
 Verify selected profiles before scanning:
 
 ```powershell
-python -B scripts/verify_rule_sources.py references/jurisdiction-profiles/cnil-fr.json -o delivery/source-checks.json
+python -B scripts/verify_rule_sources.py references/jurisdiction-profiles/cnil-fr.json -o delivery/source-checks-cnil-fr.json --update-run delivery/audit-run.json
+# Repeat the command for every other selected profile, changing the output filename.
 ```
 
 Run the controlled browser scan:
