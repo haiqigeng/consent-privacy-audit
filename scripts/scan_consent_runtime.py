@@ -457,8 +457,8 @@ def find_control(page: Any, adapter: dict[str, Any], action: str) -> tuple[Any |
         # A provider selector can be more specific than duplicated semantic
         # labels (for example OneTrust's preference-center reject button).
         # Continue to selector fallback before declaring the control ambiguous.
-    selector_matches: list[Any] = []
     for selector in control.get("provider_selectors", []):
+        selector_matches: list[Any] = []
         try:
             locator = page.locator(selector)
             for index in range(min(locator.count(), 20)):
@@ -467,10 +467,10 @@ def find_control(page: Any, adapter: dict[str, Any], action: str) -> tuple[Any |
                     selector_matches.append(item)
         except Exception:
             continue
-    if len(selector_matches) == 1:
-        return selector_matches[0], "provider-selector"
-    if len(selector_matches) > 1:
-        return None, "ambiguous provider selectors"
+        if len(selector_matches) == 1:
+            return selector_matches[0], "provider-selector"
+        if len(selector_matches) > 1:
+            return None, "ambiguous provider selectors"
     return None, "control not found"
 
 
@@ -531,6 +531,28 @@ def click_reopen_with_public_fallback(
             continue
     suffix = ",".join(attempted) if attempted else "none"
     return False, f"{method}; public-declaration-fallback-exhausted:{suffix}"
+
+
+def wait_for_cmp_ui_settle(page: Any, action: str, timeout_ms: int) -> None:
+    if action not in {"accept", "reject", "withdraw"}:
+        return
+    try:
+        page.wait_for_function(
+            """action => {
+              const visible = selector => Array.from(document.querySelectorAll(selector)).some(el => {
+                const style = window.getComputedStyle(el);
+                return style.display !== 'none' && style.visibility !== 'hidden' && !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+              });
+              if (action === 'withdraw') return !visible('#onetrust-banner-sdk,#onetrust-pc-sdk');
+              return !visible('#onetrust-banner-sdk');
+            }""",
+            arg=action,
+            timeout=min(timeout_ms, 5000),
+        )
+    except Exception:
+        # The state reader remains authoritative; this bounded wait only gives
+        # slow CMP templates a chance to settle before the state is evaluated.
+        return
 
 
 def storage_metadata(page: Any, context: Any) -> dict[str, Any]:
@@ -896,6 +918,7 @@ def execute_scenario(
                 transition_states_verified = False
                 break
             settled, elapsed = recorder.wait_quiet(page, quiet_ms=quiet_ms, timeout_ms=timeout_ms)
+            wait_for_cmp_ui_settle(page, action, timeout_ms)
             state = read_cmp_state(page, adapter)
             action_state_verified = state_matches_action(state, action, baseline_state=initial_state)
             transition_states_verified = transition_states_verified and action_state_verified
