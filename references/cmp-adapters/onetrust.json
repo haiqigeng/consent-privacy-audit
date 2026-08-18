@@ -31,7 +31,7 @@
     "preferences": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|cookies settings|manage preferences|customize|parametrer|parametres des cookies|gerer mes choix|cookie-instellingen|cookie-einstellungen)$"], "provider_selectors": ["#onetrust-pc-btn-handler", ".ot-sdk-show-settings", "#ot-sdk-btn"]},
     "save": {"roles": ["button"], "label_patterns": ["^(confirm my choices|save choices|save|confirmer mes choix|enregistrer|confirm my choices)$"], "provider_selectors": [".save-preference-btn-handler"]},
     "reopen": {"roles": ["button", "link"], "label_patterns": ["^(cookie settings|cookies settings|privacy settings|manage cookies|gerer mes cookies|mes preferences|parametres des cookies|cookie-instellingen|cookie-einstellungen)$"], "provider_selectors": ["#onetrust-pc-btn-handler", ".ot-sdk-show-settings", "#ot-sdk-btn"]},
-    "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(reject all|withdraw|tout refuser|retirer mon consentement)$"], "provider_selectors": ["#onetrust-reject-all-handler"]}
+    "withdraw": {"roles": ["button", "link"], "label_patterns": ["^(reject all|withdraw|tout refuser|retirer mon consentement)$"], "provider_selectors": [".ot-pc-refuse-all-handler", "#onetrust-reject-all-handler"]}
   },
   "locales": ["en", "fr"],
   "api_fallback": {"allowed": false, "documented_method": null, "ux_status_when_used": "NOT_TESTED"},

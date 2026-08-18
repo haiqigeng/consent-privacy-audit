@@ -454,7 +454,9 @@ def find_control(page: Any, adapter: dict[str, Any], action: str) -> tuple[Any |
         exact = [item for item in semantic if normalize_label(item[1]) in {"accept all", "reject all", "tout accepter", "tout refuser", "save choices", "confirmer mes choix"}]
         if len(exact) == 1:
             return exact[0][0], f"semantic-exact:{exact[0][1]}"
-        return None, "ambiguous semantic controls"
+        # A provider selector can be more specific than duplicated semantic
+        # labels (for example OneTrust's preference-center reject button).
+        # Continue to selector fallback before declaring the control ambiguous.
     selector_matches: list[Any] = []
     for selector in control.get("provider_selectors", []):
         try:
